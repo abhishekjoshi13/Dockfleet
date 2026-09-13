@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import json
 from pathlib import Path
 import logging
 import time
@@ -163,13 +164,21 @@ def down(path: Path = typer.Argument("examples/dockfleet.yaml")):
 # ------------------------------------------------
 
 @app.command()
-def ps(path: Path = typer.Argument("examples/dockfleet.yaml")):
+def ps(path: Path = typer.Argument("examples/dockfleet.yaml"),
+       output_json: bool = typer.Option(False, "--json", help="Output sevice status in JSON format"),
+):
     """Show currently running DockFleet containers."""
     try:
-        typer.echo("Listing running containers...\n")
+        
 
         config = load_config(path)
         orch = Orchestrator(config)
+        if output_json:
+            stats = orch.get_service_stats()
+            serialized_stats = [stat.model_dump() for stat in stats]
+            typer.echo(json.dumps(serialized_stats, indent=2))
+            return
+        typer.echo("Listing running containers...\n")
         orch.ps()
     except Exception as e:
         typer.echo(f"Error listing containers: {e}")

@@ -170,7 +170,14 @@ dockfleet ps
 ```
 
 Displays currently running containers managed by DockFleet.
+---
 
+##### Check running services in JSON format
+
+```bash
+dockfleet ps --json 
+dockfleet ps --json | jq '.[].service_name' 
+```
 ---
 
 ##### Stop services
